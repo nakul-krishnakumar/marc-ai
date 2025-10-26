@@ -1,14 +1,12 @@
-# app/routers/code_review.py
-import subprocess
-import tempfile
+from pprint import pprint
 
-import requests
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 
+from app.agents.auditor_agent import AuditorAgent
 from app.core.dependencies import get_orchestrator
 from app.models.report import ConsolidatedReport
 from app.models.requests import RepoRequest
-from app.services.code_review_service import CodeReviewService
+from app.services.code_review_service import RepoClonerService
 
 router = APIRouter()
 
@@ -19,20 +17,14 @@ async def analyze_repo(
     orchestrator=Depends(get_orchestrator)
 ):
     try:
-        repo_url = str(payload.repo_url)
-        ref = str(payload.ref)
-        scan_id = str(payload.scan_id)
+        tmpdir: str = RepoClonerService(
+            repo_url=str(payload.repo_url),
+            ref=str(payload.ref) if payload.ref else "",
+            scan_id="scan_stub_id"
+        ).clone()
 
-        code_reviewer = CodeReviewService(repo_url, ref, scan_id)
-        code_reviewer.clone_repo()
+        background_tasks.add_task(orchestrator.run, tmpdir)
 
-        """
-        Trigger analysis run. This endpoint enqueues a workflow and returns a run_id.
-        Business logic should:
-        - validate and clone repo into a temp workspace
-        - schedule agents (via LangGraph orchestrator)
-        - persist run metadata
-        """
         run_id = "run_stub_id"  # TODO: replace with generated id
         # TODO: enqueue background workflow using orchestrator
         return {"run_id": run_id, "message": "Analysis scheduled."}

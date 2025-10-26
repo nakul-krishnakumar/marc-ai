@@ -1,6 +1,9 @@
-# # app/core/dependencies.py
-# # from langchain_openai import AzureChatOpenAI
-# from app.core.config import settings
+from langchain_openai import AzureChatOpenAI
+from pydantic import SecretStr
+
+from app.core.config import settings
+from app.workflows.code_review_workflow import build_workflow
+
 
 def get_orchestrator():
     """
@@ -9,18 +12,24 @@ def get_orchestrator():
     """
     class AnalysisOrchestrator:
         def __init__(self):
-            pass
-            # self.llm = AzureChatOpenAI(
-            #     model="gpt-4o",
-            #     temperature=0,
-            #     azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
-            #     api_key=settings.AZURE_OPENAI_API_KEY,
-            #     api_version=settings.AZURE_OPENAI_API_VERSION,
-            #     azure_deployment=settings.AZURE_OPENAI_DEPLOYMENT,
-            # )
+            self.llm = AzureChatOpenAI(
+                model=settings.AZURE_OPENAI_DEPLOYMENT,
+                temperature=0.3,
+                azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
+                azure_deployment=settings.AZURE_OPENAI_DEPLOYMENT,
+                api_version=settings.AZURE_OPENAI_API_VERSION,
+                api_key=SecretStr(settings.AZURE_OPENAI_API_KEY),
+            )
 
-        # def run(self, input_data):
-        #     # return self.llm.invoke(input_data)
+            self.graph = build_workflow()
+            self.state = {}
+
+            # Debug: print the workflow graph
+            print(self.graph.get_graph().draw_ascii())
+
+        def run(self, tmpdir: str) -> None:
+            self.state["repo_path"] = tmpdir
+            self.graph.invoke(self.state)
+            return
 
     return AnalysisOrchestrator()
-

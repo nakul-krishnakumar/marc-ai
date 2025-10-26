@@ -1,6 +1,7 @@
 # app/core/config.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -10,13 +11,12 @@ class Settings(BaseSettings):
     )
 
     HF_TOKEN: str = ""
-    
+
     AZURE_OPENAI_API_VERSION: str = ""
     AZURE_OPENAI_ENDPOINT: str = ""
     AZURE_OPENAI_API_KEY: str = ""
-    AZURE_OPENAI_DEPLOYMENT: str = "gpt-4-o"
-    AZURE_OPENAI_TARGET_URI: str = ""
-    
+    AZURE_OPENAI_DEPLOYMENT: str = "gpt-4o"
+
     LOG_LEVEL: str = "INFO"
     ENVIRONMENT: str = "production"
 
