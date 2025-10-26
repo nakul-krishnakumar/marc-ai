@@ -3,7 +3,6 @@ from fastapi import FastAPI
 
 from app.core.config import settings
 from app.routers import code_review
-from app.workflows import code_review_workflow
 
 app = FastAPI(
     title="MARC-AI Multi-Agent Code Review",
@@ -23,8 +22,6 @@ async def health_check():
 @app.get("/", tags=["Root"])
 async def root():
     return { "message": "Welcome to the MARC-AI Multi-Agent Code Review API" }
-
-print(code_review_workflow.graph.get_graph().draw_ascii())
 
 if __name__ == "__main__":
     import uvicorn

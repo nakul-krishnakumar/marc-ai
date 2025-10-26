@@ -1,5 +1,5 @@
-# app/models/requests.py
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+
 
 class RepoRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)

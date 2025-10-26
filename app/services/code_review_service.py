@@ -1,13 +1,12 @@
 import tempfile
 from pathlib import Path
-from typing import Any
 
 import requests
-import shutil
+
 from app.utils.subprocess_runner import run_safe_subprocess
 
 
-class CodeReviewService:
+class RepoClonerService:
     def __init__(self, repo_url: str, ref: str, scan_id: str):
         self.repo_url: str = repo_url
         self.ref: str = ref
@@ -24,10 +23,9 @@ class CodeReviewService:
             return False
 
         response = requests.get(self.repo_url)
-        print(response)
         return response.status_code == 200
 
-    def clone_repo(self) -> dict[str, Any]:
+    def clone(self) -> str:
         """
         Clone the repository and return the path to the cloned repository.
         """
@@ -57,9 +55,4 @@ class CodeReviewService:
             # shutil.rmtree(tmpdir)
             pass
 
-        return {"": ""}
-    # def get_reviews(self):
-    #     return self.review_repository.get_reviews()
-
-    # def add_review(self, review):
-    #     self.review_repository.add_review(review)
+        return tmpdir
