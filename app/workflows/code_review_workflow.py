@@ -5,7 +5,8 @@ from app.workflows.state import RepoAnalysisState
 
 # --- Node functions (stubs for now) ---
 def supervisor(state: RepoAnalysisState):
-    print("Supervisor: initializing repo analysis.")
+    print("Supervisor: initializing repo analysis...")
+    
     return {"python_files": [], "js_files": []}
 
 
@@ -36,7 +37,7 @@ def conflict_resolver(state: RepoAnalysisState):
 
 def explainer_agent(state: RepoAnalysisState):
     print("Explainer Agent: summarizing report.")
-    markdown = "\n".join(f"- {f['msg']}" for f in state["merged_findings"])
+    markdown = "\n".join(f"- {f['msg']}" for f in state["merged_findings"]) # type: ignore
     return {"markdown_report": f"### Code Review Report\n{markdown}"}
 
 
