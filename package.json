@@ -1,0 +1,13 @@
+{
+    "name": "marc-ai",
+    "version": "0.1.0",
+    "description": "Multi-Agent Review & Consolidation - ESLint configuration",
+    "private": true,
+    "dependencies": {
+        "eslint": "^8.57.0"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "lint": "eslint ."
+    }
+}
