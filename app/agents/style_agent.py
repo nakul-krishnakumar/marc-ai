@@ -1,19 +1,22 @@
 from typing import Any
 import os
 import json
-from app.utils.subprocess_runner import run_safe_subprocess
 import shutil
+from app.utils.subprocess_runner import run_safe_subprocess
+from app.core.logger import logger
+
 
 class StyleAgent:
     """
     Runs style and formatting checks using Ruff (Python) and ESLint (JS).
     """
 
-    def __init__(self, repo_path: str, js_ts_files: int, py_files: int) -> None:
+    def __init__(self, repo_path: str, js_ts_files: int, py_files: int, log_all_audits: bool = False) -> None:
         self.repo_path = repo_path
         self.findings = []
         self.js_ts_files = js_ts_files
         self.py_files = py_files
+        self.log_all_audits = log_all_audits
 
     def _run_eslint_linting(self):
         """
@@ -36,7 +39,7 @@ class StyleAgent:
             temp_package_created = True
 
         # Install ESLint dependencies locally in the temp directory
-        print("Installing ESLint dependencies in temp directory...")
+        logger.info("Installing ESLint dependencies in temp directory...")
         install_cmd = [
             "npm", "install", "--no-save", "--silent",
             "eslint",
@@ -44,9 +47,9 @@ class StyleAgent:
             "@typescript-eslint/eslint-plugin"
         ]
         install_result = run_safe_subprocess(install_cmd, cwd=self.repo_path, timeout=120)
-        
+
         if install_result["returncode"] != 0:
-            print(f"Failed to install ESLint dependencies: {install_result['stderr']}")
+            logger.error(f"Failed to install ESLint dependencies: {install_result['stderr']}")
             # Cleanup and return
             if temp_package_created and os.path.exists(package_json):
                 os.remove(package_json)
@@ -134,4 +137,23 @@ module.exports = [
         if self.js_ts_files > 0:
             self._run_eslint_linting()
 
-        return {"agent": "style", "findings": self.findings}
+        if self.log_all_audits:
+            logger.info("Style agent findings:")
+            for i in self.findings:
+                logger.info(f"Tool: {i.get('tool')}")
+
+                results = i.get("output", [])["results"]
+                for result in results:
+                    logger.info(f"File: {result.get('filePath')}")
+                    for message in result.get("messages", []):
+                        logger.info(
+                            f"  Line {message.get('line')}, Col {message.get('column')}: {message.get('message')} ({message.get('ruleId')})\n"
+                        )
+
+                logger.debug(f"Errors: {i.get('errors')}")
+                logger.info("-----\n")
+
+        return {
+            "agent": "style",
+            "findings": self.findings
+        }

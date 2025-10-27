@@ -5,6 +5,7 @@ from app.agents.auditor_agent import Files
 
 
 class RepoAnalysisState(TypedDict):
+    log_all_audits: bool
     repo_path: str
     files: Files
     style_findings: Annotated[list[dict], operator.add]

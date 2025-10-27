@@ -10,7 +10,7 @@ def setup_logger(name: str = "marc-ai") -> logging.Logger:
     Configure structured logging for the application.
     """
     logger = logging.getLogger(name)
-    logger.setLevel(getattr(logging, settings.log_level.upper(), logging.INFO))
+    logger.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
 
     handler = logging.StreamHandler(sys.stdout)
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")

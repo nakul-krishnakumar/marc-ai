@@ -28,8 +28,9 @@ def get_orchestrator():
             # Debug: print the workflow graph
             print(self.graph.get_graph().draw_ascii())
 
-        def run(self, tmpdir: str) -> None:
+        def run(self, tmpdir: str, log_all_audit: bool = False) -> None:
             self.state["repo_path"] = tmpdir
+            self.state["log_all_audits"] = log_all_audit
             self.graph.invoke(self.state)
             return
 
