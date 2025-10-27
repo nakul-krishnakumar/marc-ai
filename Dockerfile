@@ -22,31 +22,21 @@ COPY requirements.txt /workspace/
 RUN pip install --upgrade pip && \
     pip install --user --no-cache-dir -r requirements.txt
 
-# ---- Stage: node-builder ----
-FROM node:20-slim AS node-builder
-WORKDIR /workspace
-
-# Install Node.js tools (ESLint, etc.)
-RUN npm install -g eslint
-
 # ---- Stage: prod ----
 FROM base AS prod
 WORKDIR /app
 
 # Install only runtime dependencies needed for production
+# Node.js and npm are needed to install ESLint locally per analysis
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl \
     nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python packages from builder
 COPY --from=builder /root/.local /root/.local
-
-# Copy Node.js global packages from node-builder
-COPY --from=node-builder /usr/local/lib/node_modules /usr/local/lib/node_modules
-COPY --from=node-builder /usr/local/bin/eslint /usr/local/bin/eslint
-COPY --from=node-builder /usr/local/bin/node /usr/local/bin/node
 
 # Copy application code
 COPY . /app
@@ -74,9 +64,6 @@ RUN apt-get update && \
 
 # Copy Python packages from builder
 COPY --from=builder /root/.local /root/.local
-
-# Install Node.js tools directly in dev (allows npm install during dev)
-RUN npm install -g eslint
 
 # Copy application code (will be overridden by volume mount in dev)
 COPY . /app

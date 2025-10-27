@@ -18,7 +18,7 @@ def auditor_agent(state: RepoAnalysisState):
     repo_path = state["repo_path"]
 
     auditor = AuditorAgent(repo_path)
-    files = auditor.generate_dir_metadata(log_all=False)
+    files = auditor.generate_dir_metadata(log_all=True)
     state["files"] = files
 
     return state
@@ -27,9 +27,14 @@ def auditor_agent(state: RepoAnalysisState):
 def style_agent(state: RepoAnalysisState):
     print("Style Agent: running Ruff/ESLint linting.")
 
-    styler = StyleAgent()
-    result = styler.run(state["repo_path"])
+    styler = StyleAgent(
+        repo_path=state["repo_path"],
+        js_ts_files=state["files"].js_ts_files,
+        py_files=state["files"].py_files
+    )
+    result = styler.run()
 
+    print("inside stlye agent: ")
     for i in result.get("findings", []):
         print("tool: ", i.get("tool"))
         print("output: ", i.get("output"))

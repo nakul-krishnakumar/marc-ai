@@ -1,15 +1,8 @@
-# app/agents/security_agent.py
-"""
-Security agent for running Bandit and Semgrep static analysis.
-TODO: Implement subprocess calls to Bandit/Semgrep with proper safety measures.
-"""
-
 from typing import Any
 
-from app.agents.base_agent import BaseAgent
 
 
-class SecurityAgent(BaseAgent):
+class SecurityAgent:
     """
     Runs security checks using Bandit and Semgrep.
     """
