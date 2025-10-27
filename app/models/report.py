@@ -10,6 +10,7 @@ class AgentFinding(BaseModel):
     findings: list[dict[str, Any]]
     metadata: dict[str, Any] | None = None
 
+
 class ConsolidatedReport(BaseModel):
     model_config = ConfigDict(extra="forbid")
     run_id: str

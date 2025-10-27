@@ -10,6 +10,7 @@ def get_orchestrator():
     Return an orchestrator / LangGraph client instance.
     This is a factory placeholder — do not initialize heavy clients at import time.
     """
+
     class AnalysisOrchestrator:
         def __init__(self):
             self.llm = AzureChatOpenAI(

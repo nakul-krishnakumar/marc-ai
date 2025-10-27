@@ -3,6 +3,7 @@
 Explainer agent using Azure OpenAI for generating contextualized explanations.
 TODO: Implement Azure OpenAI integration for report generation.
 """
+
 from typing import Any
 
 

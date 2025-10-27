@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    lefthook-lint:
+      run: |
+        ruff check . --fix && ruff format .
+        

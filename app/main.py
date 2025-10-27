@@ -15,13 +15,16 @@ app = FastAPI(
 
 app.include_router(code_review.router, prefix="/api/v1/review", tags=["Review"])
 
+
 @app.get("/health", tags=["Health"])
 async def health_check():
-    return { "status": "ok" }
+    return {"status": "ok"}
+
 
 @app.get("/", tags=["Root"])
 async def root():
-    return { "message": "Welcome to the MARC-AI Multi-Agent Code Review API" }
+    return {"message": "Welcome to the MARC-AI Multi-Agent Code Review API"}
+
 
 if __name__ == "__main__":
     import uvicorn

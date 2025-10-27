@@ -3,6 +3,7 @@
 Security agent for running Bandit and Semgrep static analysis.
 TODO: Implement subprocess calls to Bandit/Semgrep with proper safety measures.
 """
+
 from typing import Any
 
 from app.agents.base_agent import BaseAgent

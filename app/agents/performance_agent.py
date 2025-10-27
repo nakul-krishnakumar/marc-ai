@@ -3,6 +3,7 @@
 Performance agent for running Radon complexity analysis.
 TODO: Implement subprocess calls to Radon with proper safety measures.
 """
+
 from typing import Any
 
 from app.agents.base_agent import BaseAgent

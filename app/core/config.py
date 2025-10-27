@@ -7,7 +7,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
-        extra="ignore"  # Allow extra fields from .env
+        extra="ignore",  # Allow extra fields from .env
     )
 
     HF_TOKEN: str = ""
@@ -19,5 +19,6 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
     ENVIRONMENT: str = "production"
+
 
 settings = Settings()

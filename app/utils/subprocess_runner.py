@@ -36,13 +36,13 @@ def run_safe_subprocess(
         print(f"Return code: {result.returncode}")
 
         output: dict[str, Any] = {
-            "stdout": result.stdout.decode('utf-8', errors='ignore'),
-            "stderr": result.stderr.decode('utf-8', errors='ignore'),
+            "stdout": result.stdout.decode("utf-8", errors="ignore"),
+            "stderr": result.stderr.decode("utf-8", errors="ignore"),
             "returncode": result.returncode,
         }
 
         return output
-    
+
     except subprocess.TimeoutExpired:
         print(f"Command timed out after {timeout}s: {' '.join(command)}")
         return {
