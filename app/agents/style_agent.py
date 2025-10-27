@@ -1,9 +1,10 @@
-from typing import Any
-import os
 import json
+import os
 import shutil
-from app.utils.subprocess_runner import run_safe_subprocess
+from typing import Any
+
 from app.core.logger import logger
+from app.utils.subprocess_runner import run_safe_subprocess
 
 
 class StyleAgent:
@@ -11,7 +12,13 @@ class StyleAgent:
     Runs style and formatting checks using Ruff (Python) and ESLint (JS).
     """
 
-    def __init__(self, repo_path: str, js_ts_files: int, py_files: int, log_all_audits: bool = False) -> None:
+    def __init__(
+        self,
+        repo_path: str,
+        js_ts_files: int,
+        py_files: int,
+        log_all_audits: bool = False
+    ) -> None:
         self.repo_path = repo_path
         self.findings = []
         self.js_ts_files = js_ts_files
@@ -139,18 +146,20 @@ module.exports = [
 
         if self.log_all_audits:
             logger.info("Style agent findings:")
-            for i in self.findings:
-                logger.info(f"Tool: {i.get('tool')}")
+            for finding in self.findings:
+                logger.info(f"Tool: {finding.get('tool')}")
 
-                results = i.get("output", [])["results"]
+                results = finding.get("output", [])["results"]
                 for result in results:
                     logger.info(f"File: {result.get('filePath')}")
                     for message in result.get("messages", []):
-                        logger.info(
-                            f"  Line {message.get('line')}, Col {message.get('column')}: {message.get('message')} ({message.get('ruleId')})\n"
+                        logger.info(f"""
+                            Line {message.get('line')},
+                            Col {message.get('column')}: {message.get('message')}
+                            ({message.get('ruleId')})\n"""
                         )
 
-                logger.debug(f"Errors: {i.get('errors')}")
+                logger.debug(f"Errors: {finding.get('errors')}")
                 logger.info("-----\n")
 
         return {

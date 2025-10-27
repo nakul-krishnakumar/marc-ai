@@ -4,6 +4,7 @@ from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from app.agents.auditor_agent import AuditorAgent
+from app.agents.security_agent import SecurityAgent
 from app.agents.style_agent import StyleAgent
 from app.core.logger import logger
 from app.workflows.state import RepoAnalysisState
@@ -32,7 +33,7 @@ def style_agent(state: RepoAnalysisState):
         repo_path=state["repo_path"],
         js_ts_files=state["files"].js_ts_files,
         py_files=state["files"].py_files,
-        log_all_audits=state['log_all_audits'],
+        # log_all_audits=state['log_all_audits'],
     )
     result = styler.run()
     state["style_findings"] = result.get("findings", [])
@@ -41,6 +42,16 @@ def style_agent(state: RepoAnalysisState):
 
 def security_agent(state: RepoAnalysisState):
     logger.info("Security Agent: running Bandit/Semgrep.")
+
+    securer = SecurityAgent(
+        repo_path=state["repo_path"],
+        js_ts_files=state["files"].js_ts_files,
+        py_files=state["files"].py_files,
+        log_all_audits=state['log_all_audits'],
+    )
+    result = securer.run()
+    state["security_findings"] = result
+
     return {"security_findings": [{"msg": "Demo security issue"}]}
 
 
@@ -52,9 +63,9 @@ def performance_agent(state: RepoAnalysisState):
 def conflict_resolver(state: RepoAnalysisState):
     logger.info("Conflict Resolver: merging agent results.")
     merged = (
-        state.get("style_findings", [])
-        + state.get("security_findings", [])
-        + state.get("performance_findings", [])
+        str(state.get("style_findings", []))
+        + str(state.get("security_findings", []))
+        + str(state.get("performance_findings", []))
     )
     return {"merged_findings": merged}
 
