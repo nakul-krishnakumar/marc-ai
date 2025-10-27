@@ -15,9 +15,11 @@ class IssueType(str, Enum):
     HIGH = "HIGH"
     UNDEFINED = "UNDEFINED"
 
+
 class IssueCWE(BaseModel):
     id: int
     link: HttpUrl
+
 
 class BanditFinding(BaseModel):
     code: str
@@ -34,14 +36,17 @@ class BanditFinding(BaseModel):
     test_id: str
     test_name: str
 
+
 class BanditFindings(BaseModel):
     bandit_errors: dict[str, str] | None = None
     stderror: str
     results: list[BanditFinding]
 
+
 class SecurityFindings(BaseModel):
     Bandit: BanditFindings | None = None
     Semgrep: dict[str, Any] | None = None
+
 
 class SecurityAgent:
     """
@@ -49,11 +54,7 @@ class SecurityAgent:
     """
 
     def __init__(
-        self,
-        repo_path: str,
-        js_ts_files: int,
-        py_files: int,
-        log_all_audits: bool = False
+        self, repo_path: str, js_ts_files: int, py_files: int, log_all_audits: bool = False
     ) -> None:
         self.repo_path = repo_path
         self.js_ts_files = js_ts_files
@@ -97,10 +98,7 @@ class SecurityAgent:
                     cwe_id = 0
                     cwe_link = "https://cwe.mitre.org/"
 
-                issue_cwe = IssueCWE(
-                    id=cwe_id,
-                    link=HttpUrl(cwe_link)
-                )
+                issue_cwe = IssueCWE(id=cwe_id, link=HttpUrl(cwe_link))
 
                 finding = BanditFinding(
                     code=item["code"],
@@ -126,7 +124,9 @@ class SecurityAgent:
             logger.info(f"Bandit Findings: {len(self.findings.Bandit.results)} issues found")
             if self.findings.Bandit.results:
                 for finding in self.findings.Bandit.results[:5]:  # Show first 5
-                    logger.info(f"  - {finding.issue_severity.value}: {finding.issue_text} ({finding.filename}:{finding.line_number})")
+                    logger.info(
+                        f"  - {finding.issue_severity.value}: {finding.issue_text} ({finding.filename}:{finding.line_number})"
+                    )
                 if len(self.findings.Bandit.results) > 5:
                     logger.info(f"  ... and {len(self.findings.Bandit.results) - 5} more")
         else:

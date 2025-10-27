@@ -13,11 +13,7 @@ class StyleAgent:
     """
 
     def __init__(
-        self,
-        repo_path: str,
-        js_ts_files: int,
-        py_files: int,
-        log_all_audits: bool = False
+        self, repo_path: str, js_ts_files: int, py_files: int, log_all_audits: bool = False
     ) -> None:
         self.repo_path = repo_path
         self.findings = []
@@ -36,11 +32,7 @@ class StyleAgent:
 
         # Create package.json if it doesn't exist
         if not os.path.exists(package_json):
-            minimal_package = {
-                "name": "temp-eslint-analysis",
-                "version": "1.0.0",
-                "private": True
-            }
+            minimal_package = {"name": "temp-eslint-analysis", "version": "1.0.0", "private": True}
             with open(package_json, "w") as f:
                 json.dump(minimal_package, f)
             temp_package_created = True
@@ -48,10 +40,13 @@ class StyleAgent:
         # Install ESLint dependencies locally in the temp directory
         logger.info("Installing ESLint dependencies in temp directory...")
         install_cmd = [
-            "npm", "install", "--no-save", "--silent",
+            "npm",
+            "install",
+            "--no-save",
+            "--silent",
             "eslint",
             "@typescript-eslint/parser",
-            "@typescript-eslint/eslint-plugin"
+            "@typescript-eslint/eslint-plugin",
         ]
         install_result = run_safe_subprocess(install_cmd, cwd=self.repo_path, timeout=120)
 
@@ -103,11 +98,13 @@ module.exports = [
             eslint_result = run_safe_subprocess(cmd, cwd=self.repo_path)
 
             if eslint_result["stdout"]:
-                self.findings.append({
-                    "tool": "eslint",
-                    "output": json.loads(eslint_result["stdout"]),
-                    "errors": eslint_result["stderr"]
-                })
+                self.findings.append(
+                    {
+                        "tool": "eslint",
+                        "output": json.loads(eslint_result["stdout"]),
+                        "errors": eslint_result["stderr"],
+                    }
+                )
 
         finally:
             # Cleanup temporary files
@@ -154,15 +151,11 @@ module.exports = [
                     logger.info(f"File: {result.get('filePath')}")
                     for message in result.get("messages", []):
                         logger.info(f"""
-                            Line {message.get('line')},
-                            Col {message.get('column')}: {message.get('message')}
-                            ({message.get('ruleId')})\n"""
-                        )
+                            Line {message.get("line")},
+                            Col {message.get("column")}: {message.get("message")}
+                            ({message.get("ruleId")})\n""")
 
                 logger.debug(f"Errors: {finding.get('errors')}")
                 logger.info("-----\n")
 
-        return {
-            "agent": "style",
-            "findings": self.findings
-        }
+        return {"agent": "style", "findings": self.findings}

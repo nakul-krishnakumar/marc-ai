@@ -20,7 +20,7 @@ def auditor_agent(state: RepoAnalysisState):
     repo_path = state["repo_path"]
 
     auditor = AuditorAgent(repo_path)
-    files = auditor.generate_dir_metadata(log_all=state['log_all_audits'])
+    files = auditor.generate_dir_metadata(log_all=state["log_all_audits"])
     state["files"] = files
 
     return state
@@ -47,7 +47,7 @@ def security_agent(state: RepoAnalysisState):
         repo_path=state["repo_path"],
         js_ts_files=state["files"].js_ts_files,
         py_files=state["files"].py_files,
-        log_all_audits=state['log_all_audits'],
+        log_all_audits=state["log_all_audits"],
     )
     result = securer.run()
     state["security_findings"] = result
