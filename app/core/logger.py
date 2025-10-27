@@ -13,12 +13,11 @@ def setup_logger(name: str = "marc-ai") -> logging.Logger:
     logger.setLevel(getattr(logging, settings.log_level.upper(), logging.INFO))
 
     handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
     return logger
+
 
 logger = setup_logger()

@@ -41,5 +41,6 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "lefthook>=2.0.1",
     "ruff>=0.14.2",
 ]

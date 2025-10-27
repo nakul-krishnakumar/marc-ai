@@ -12,20 +12,18 @@ class StyleAgent(BaseAgent):
     def run(self, repo_path: str) -> dict[str, Any]:
         """Run style checks on the repository."""
         findings = []
-        
+
         # Run Ruff for Python
         cmd = ["ruff", "check", repo_path, "--output-format=json"]
         ruff_result = run_safe_subprocess(cmd, cwd=repo_path)
-        
+
         if ruff_result["stdout"]:
-            findings.append({
-                "tool": "ruff",
-                "output": ruff_result["stdout"],
-                "errors": ruff_result["stderr"]
-            })
-        
+            findings.append(
+                {"tool": "ruff", "output": ruff_result["stdout"], "errors": ruff_result["stderr"]}
+            )
+
         # TODO: Run ESLint for JavaScript
         # eslint_result = run_safe_subprocess(["eslint", repo_path, "--format=json"])
-        
-        # print("StyleAgent findings:", findings)   
+
+        # print("StyleAgent findings:", findings)
         return {"agent": "style", "findings": findings}
