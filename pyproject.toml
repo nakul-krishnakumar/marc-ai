@@ -18,6 +18,8 @@ dependencies = [
     "pyppeteer>=2.0.0",
     "grandalf>=0.8",
     "langchain-openai>=1.0.1",
+    "bandit>=1.8.6",
+    "semgrep>=1.52.0",
 ]
 
 [project.optional-dependencies]
@@ -33,7 +35,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
-ignore = []
+ignore = ["E501"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

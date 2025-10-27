@@ -124,14 +124,27 @@ module.exports = [
         cmd = ["ruff", "check", self.repo_path, "--output-format=json"]
         ruff_result = run_safe_subprocess(cmd, cwd=self.repo_path)
 
-        if ruff_result["stdout"]:
-            self.findings.append(
-                {
-                    "tool": "ruff",
-                    "output": ruff_result["stdout"],
-                    "errors": ruff_result["stderr"],
-                }
-            )
+        logger.info(f"Ruff return code: {ruff_result['returncode']}")
+
+        # Ruff returns exit code 1 when it finds issues (normal behavior)
+        if ruff_result["returncode"] in [0, 1] and ruff_result["stdout"]:
+            try:
+                # Parse JSON output
+                output = json.loads(ruff_result["stdout"])
+                logger.info(f"Ruff found {len(output)} issues")
+
+                self.findings.append(
+                    {
+                        "tool": "ruff",
+                        "output": output,  # Store parsed JSON, not string
+                        "errors": ruff_result["stderr"],
+                    }
+                )
+            except json.JSONDecodeError as e:
+                logger.error(f"Error parsing Ruff JSON output: {e}")
+                logger.debug(f"Raw stdout: {ruff_result['stdout'][:500]}")
+        else:
+            logger.info(f"Ruff found no issues or failed. Return code: {ruff_result['returncode']}")
 
     def run(self) -> dict[str, Any]:
         """Run style checks on the repository."""
@@ -142,20 +155,22 @@ module.exports = [
             self._run_eslint_linting()
 
         if self.log_all_audits:
-            logger.info("Style agent findings:")
+            logger.info("Style Agent findings summary:")
             for finding in self.findings:
-                logger.info(f"Tool: {finding.get('tool')}")
+                tool = finding.get('tool')
+                output = finding.get('output')
 
-                results = finding.get("output", [])["results"]
-                for result in results:
-                    logger.info(f"File: {result.get('filePath')}")
-                    for message in result.get("messages", []):
-                        logger.info(f"""
-                            Line {message.get("line")},
-                            Col {message.get("column")}: {message.get("message")}
-                            ({message.get("ruleId")})\n""")
+                if tool == 'ruff' and isinstance(output, list):
+                    # Show first 3 issues
+                    for issue in output[:3]:
+                        logger.info(f"    - {issue.get('code')}: {issue.get('message')} ({issue.get('filename')}:{issue.get('location', {}).get('row')})")
+                    if len(output) > 3:
+                        logger.info(f"    ... and {len(output) - 3} more")
 
-                logger.debug(f"Errors: {finding.get('errors')}")
-                logger.info("-----\n")
+                elif tool == 'eslint' and isinstance(output, dict):
+                    results = output.get('results', [])
+                    total_warnings = sum(r.get('warningCount', 0) for r in results)
+                    total_errors = sum(r.get('errorCount', 0) for r in results)
+                    logger.info(f"  ESLint: {len(results)} files analyzed, {total_warnings} warnings, {total_errors} errors")
 
         return {"agent": "style", "findings": self.findings}

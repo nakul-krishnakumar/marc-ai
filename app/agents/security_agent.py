@@ -62,6 +62,30 @@ class SecurityAgent:
         self.log_all_audits = log_all_audits
 
         self.findings = SecurityFindings()
+    
+    def _run_semgrep(self) -> None:
+        """
+        Run Semgrep security analysis on the repository.
+        """
+
+        cmd = ["semgrep", "--config", "auto", "--json"]
+        result = run_safe_subprocess(cmd, cwd=self.repo_path, timeout=300)
+
+        logger.info(f"Semgrep return code: {result['returncode']}")
+        logger.debug(f"Semgrep stdout length: {len(result['stdout'])}")
+        logger.debug(f"Semgrep stderr: {result['stderr'][:200]}")
+
+        self.findings.Semgrep = {
+            "stderror": result["stderr"],
+            "results": [],
+        }
+
+        # Semgrep returns exit code 1 when it finds issues (normal behavior)
+        if result["returncode"] in [0, 1] and result["stdout"]:
+            output = json.loads(result["stdout"])
+            results = output.get("results", [])
+            logger.info(f"Semgrep found {len(results)} security issues")
+            self.findings.Semgrep["results"] = results
 
     def _run_bandit(self) -> None:
         """
