@@ -115,10 +115,7 @@ class SecurityAgent:
         self.py_files = py_files
         self.log_all_audits = log_all_audits
 
-        self.findings = SecurityFindings(
-            Bandit=BanditFindings(),
-            Semgrep=SemgrepFindings()
-        )
+        self.findings = SecurityFindings(Bandit=BanditFindings(), Semgrep=SemgrepFindings())
 
     def _run_semgrep(self) -> None:
         """
@@ -198,9 +195,7 @@ class SecurityAgent:
                         source=metadata_dict.get("source", ""),
                         subcategory=metadata_dict.get("subcategory", []),
                         technology=metadata_dict.get("technology", []),
-                        vulnerability_class=metadata_dict.get(
-                            "vulnerability_class", []
-                        ),
+                        vulnerability_class=metadata_dict.get("vulnerability_class", []),
                     )
 
                     # Parse extra metadata
@@ -229,9 +224,7 @@ class SecurityAgent:
 
                     self.findings.Semgrep.results.append(finding)
             else:
-                logger.warning(
-                    f"Semgrep returned unexpected code: {result['returncode']}"
-                )
+                logger.warning(f"Semgrep returned unexpected code: {result['returncode']}")
                 if result["stderr"]:
                     logger.warning(f"Semgrep stderr: {result['stderr']}")
 
@@ -298,39 +291,29 @@ class SecurityAgent:
     def _log_findings(self):
         logger.info("Security Agent findings:")
         if self.findings.Bandit:
-            logger.info(
-                f"Bandit Findings: {len(self.findings.Bandit.results)} issues found"
-            )
+            logger.info(f"Bandit Findings: {len(self.findings.Bandit.results)} issues found")
             if self.findings.Bandit.results:
                 for finding in self.findings.Bandit.results[:5]:  # Show first 5
                     logger.info(
                         f"  - {finding.issue_severity.value}: {finding.issue_text} ({finding.filename}:{finding.line_number})"
                     )
                 if len(self.findings.Bandit.results) > 5:
-                    logger.info(
-                        f"  ... and {len(self.findings.Bandit.results) - 5} more"
-                    )
+                    logger.info(f"  ... and {len(self.findings.Bandit.results) - 5} more")
             else:
                 logger.info("Bandit: Not run")
 
             # Log Semgrep findings
             if self.findings.Semgrep:
-                logger.info(
-                    f"Semgrep: {len(self.findings.Semgrep.results)} issues found"
-                )
+                logger.info(f"Semgrep: {len(self.findings.Semgrep.results)} issues found")
                 if self.findings.Semgrep.results:
                     for idx, finding in enumerate(self.findings.Semgrep.results[:3]):
                         logger.info(f"  - Finding {idx + 1}:")
-                        logger.info(
-                            f"    Severity: {finding.extra.severity}"
-                        )
+                        logger.info(f"    Severity: {finding.extra.severity}")
                         logger.info(
                             f"    Message: {finding.extra.message} ({finding.path}:{finding.start.line})"
                         )
                     if len(self.findings.Semgrep.results) > 3:
-                        logger.info(
-                            f"  ... and {len(self.findings.Semgrep.results) - 3} more"
-                        )
+                        logger.info(f"  ... and {len(self.findings.Semgrep.results) - 3} more")
             else:
                 logger.info("Semgrep: Not run")
 
