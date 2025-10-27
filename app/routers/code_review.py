@@ -19,7 +19,7 @@ async def analyze_repo(
             scan_id="scan_stub_id",
         ).clone()
 
-        background_tasks.add_task(orchestrator.run, tmpdir)
+        background_tasks.add_task(orchestrator.run, tmpdir=tmpdir, log_all_audit=True)
 
         run_id = "run_stub_id"  # TODO: replace with generated id
         # TODO: enqueue background workflow using orchestrator

@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 from typing import Any
+from app.core.logger import logger
 
 
 def run_safe_subprocess(
@@ -32,8 +33,8 @@ def run_safe_subprocess(
             shell=False,
         )
 
-        print(f"Command: {' '.join(command)}")
-        print(f"Return code: {result.returncode}")
+        logger.debug(f"Command: {' '.join(command)}")
+        logger.debug(f"Return code: {result.returncode}")
 
         output: dict[str, Any] = {
             "stdout": result.stdout.decode("utf-8", errors="ignore"),
@@ -44,14 +45,15 @@ def run_safe_subprocess(
         return output
 
     except subprocess.TimeoutExpired:
-        print(f"Command timed out after {timeout}s: {' '.join(command)}")
+        logger.warning(f"Command timed out after {timeout}s: {' '.join(command)}")
         return {
             "stdout": "",
             "stderr": f"Command timed out after {timeout} seconds",
             "returncode": -1,
         }
+
     except Exception as e:
-        print(f"Error running command {' '.join(command)}: {e}")
+        logger.error(f"Error running command {' '.join(command)}: {e}")
         return {
             "stdout": "",
             "stderr": str(e),
