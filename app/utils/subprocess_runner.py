@@ -51,6 +51,7 @@ def run_safe_subprocess(
             "stderr": f"Command timed out after {timeout} seconds",
             "returncode": -1,
         }
+
     except Exception as e:
         logger.error(f"Error running command {' '.join(command)}: {e}")
         return {
