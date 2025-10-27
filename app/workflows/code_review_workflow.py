@@ -1,9 +1,10 @@
-import glob
+import shutil
 
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from app.agents.auditor_agent import AuditorAgent
+from app.agents.style_agent import StyleAgent
 from app.workflows.state import RepoAnalysisState
 
 
@@ -22,9 +23,19 @@ def auditor_agent(state: RepoAnalysisState):
 
     return state
 
+
 def style_agent(state: RepoAnalysisState):
     print("Style Agent: running Ruff/ESLint linting.")
-    return {"style_findings": [{"msg": "Demo style warning"}]}
+
+    styler = StyleAgent()
+    result = styler.run(state["repo_path"])
+
+    for i in result.get("findings", []):
+        print("tool: ", i.get("tool"))
+        print("output: ", i.get("output"))
+        print("errors: ", i.get("errors"))
+        print("-----\n")
+    return {"style_findings": result.get("findings", [])}
 
 
 def security_agent(state: RepoAnalysisState):
@@ -49,12 +60,16 @@ def conflict_resolver(state: RepoAnalysisState):
 
 def explainer_agent(state: RepoAnalysisState):
     print("Explainer Agent: summarizing report.")
-    markdown = "\n".join(f"- {f['msg']}" for f in state["merged_findings"]) # type: ignore
-    return {"markdown_report": f"### Code Review Report\n{markdown}"}
+    # markdown = "\n".join(f"- {f['msg']}" for f in state["merged_findings"])  # type: ignore
+
+    print("tmdir: ", state["repo_path"])
+    shutil.rmtree(state["repo_path"], ignore_errors=True)
+    # return {"markdown_report": f"### Code Review Report\n{markdown}"}
+
 
 def build_workflow() -> CompiledStateGraph:
     """
-        Build and return the code review workflow graph.
+    Build and return the code review workflow graph.
     """
     workflow = StateGraph(RepoAnalysisState)
 

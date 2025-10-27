@@ -2,7 +2,7 @@ from pprint import pprint
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 
-from app.agents.auditor_agent import AuditorAgent
+from app.agents.style_agent import StyleAgent
 from app.core.dependencies import get_orchestrator
 from app.models.report import ConsolidatedReport
 from app.models.requests import RepoRequest
