@@ -9,7 +9,7 @@ class BaseAgent(ABC):
     """
 
     @abstractmethod
-    async def run(self, repo_path: str) -> dict[str, Any]:
+    def run(self, repo_path: str) -> dict[str, Any]:
         """
         Execute the agent's analysis on the given repository path.
 
