@@ -4,9 +4,11 @@
     "description": "Multi-Agent Review & Consolidation - ESLint configuration",
     "private": true,
     "dependencies": {
-        "eslint": "^8.57.0"
+        "@typescript-eslint/eslint-plugin": "^8.46.2",
+        "@typescript-eslint/parser": "^8.46.2",
+        "eslint": "^8.57.0",
+        "typescript": "^5.9.3"
     },
-    "devDependencies": {},
     "scripts": {
         "lint": "eslint ."
     }
