@@ -33,7 +33,7 @@ def style_agent(state: RepoAnalysisState):
         repo_path=state["repo_path"],
         js_ts_files=state["files"].js_ts_files,
         py_files=state["files"].py_files,
-        log_all_audits=state['log_all_audits'],
+        log_all_audits=state["log_all_audits"],
     )
     result = styler.run()
     state["style_findings"] = result.get("findings", [])

@@ -62,7 +62,7 @@ class SecurityAgent:
         self.log_all_audits = log_all_audits
 
         self.findings = SecurityFindings()
-    
+
     def _run_semgrep(self) -> None:
         """
         Run Semgrep security analysis on the repository.

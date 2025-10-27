@@ -157,20 +157,24 @@ module.exports = [
         if self.log_all_audits:
             logger.info("Style Agent findings summary:")
             for finding in self.findings:
-                tool = finding.get('tool')
-                output = finding.get('output')
+                tool = finding.get("tool")
+                output = finding.get("output")
 
-                if tool == 'ruff' and isinstance(output, list):
+                if tool == "ruff" and isinstance(output, list):
                     # Show first 3 issues
                     for issue in output[:3]:
-                        logger.info(f"    - {issue.get('code')}: {issue.get('message')} ({issue.get('filename')}:{issue.get('location', {}).get('row')})")
+                        logger.info(
+                            f"    - {issue.get('code')}: {issue.get('message')} ({issue.get('filename')}:{issue.get('location', {}).get('row')})"
+                        )
                     if len(output) > 3:
                         logger.info(f"    ... and {len(output) - 3} more")
 
-                elif tool == 'eslint' and isinstance(output, dict):
-                    results = output.get('results', [])
-                    total_warnings = sum(r.get('warningCount', 0) for r in results)
-                    total_errors = sum(r.get('errorCount', 0) for r in results)
-                    logger.info(f"  ESLint: {len(results)} files analyzed, {total_warnings} warnings, {total_errors} errors")
+                elif tool == "eslint" and isinstance(output, dict):
+                    results = output.get("results", [])
+                    total_warnings = sum(r.get("warningCount", 0) for r in results)
+                    total_errors = sum(r.get("errorCount", 0) for r in results)
+                    logger.info(
+                        f"  ESLint: {len(results)} files analyzed, {total_warnings} warnings, {total_errors} errors"
+                    )
 
         return {"agent": "style", "findings": self.findings}
