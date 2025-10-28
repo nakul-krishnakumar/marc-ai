@@ -7,7 +7,6 @@ from app.agents.security_agent import SecurityFindings
 from langchain_openai import AzureChatOpenAI
 
 
-
 class RepoAnalysisState(TypedDict):
     llm: AzureChatOpenAI
     log_all_audits: bool

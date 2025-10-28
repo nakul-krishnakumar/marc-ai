@@ -1,9 +1,8 @@
-
-
 from typing import Any
 from langchain_openai import AzureChatOpenAI
 
 from app.core.logger import logger
+
 
 class ExplainerAgent:
     """
@@ -15,7 +14,6 @@ class ExplainerAgent:
         self.llm = llm
 
     def run(self) -> str:
-        
         logger.info("Explainer Agent: generating explanation report...")
         output = self.llm.invoke("Explain the following findings in detail:\n" + str(self.findings))
         logger.info("Generated explanation using LLM.")

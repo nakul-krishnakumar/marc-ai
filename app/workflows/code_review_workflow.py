@@ -82,10 +82,7 @@ def explainer_agent(state: RepoAnalysisState):
     logger.info("Explainer Agent: summarizing report.")
     # markdown = "\n".join(f"- {f['msg']}" for f in state["merged_findings"])  # type: ignore
 
-    explainer = ExplainerAgent(
-        findings=state["merged_findings"],
-        llm=state["llm"]
-    )
+    explainer = ExplainerAgent(findings=state["merged_findings"], llm=state["llm"])
 
     explainer.run()
 
