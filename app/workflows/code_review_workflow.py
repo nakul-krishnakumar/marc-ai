@@ -4,8 +4,9 @@ from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from app.agents.auditor_agent import AuditorAgent
-from app.agents.security_agent import SecurityAgent
+from app.agents.explainer_agent import ExplainerAgent
 from app.agents.performance_agent import PerformanceAgent
+from app.agents.security_agent import SecurityAgent
 from app.agents.style_agent import StyleAgent
 from app.core.logger import logger
 from app.workflows.state import RepoAnalysisState
@@ -81,7 +82,12 @@ def explainer_agent(state: RepoAnalysisState):
     logger.info("Explainer Agent: summarizing report.")
     # markdown = "\n".join(f"- {f['msg']}" for f in state["merged_findings"])  # type: ignore
 
-    print(state)
+    explainer = ExplainerAgent(
+        findings=state["merged_findings"],
+        llm=state["llm"]
+    )
+
+    explainer.run()
 
     logger.info(f"Cleaning up tmpdir: {state['repo_path']}")
     shutil.rmtree(state["repo_path"], ignore_errors=True)

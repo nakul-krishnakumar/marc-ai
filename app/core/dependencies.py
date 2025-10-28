@@ -31,6 +31,8 @@ def get_orchestrator():
         def run(self, tmpdir: str, log_all_audit: bool = False) -> None:
             self.state["repo_path"] = tmpdir
             self.state["log_all_audits"] = log_all_audit
+            self.state["llm"] = self.llm
+
             self.graph.invoke(self.state)
             return
 

@@ -1,17 +1,27 @@
-# app/agents/explainer_agent.py
-"""
-Explainer agent using Azure OpenAI for generating contextualized explanations.
-TODO: Implement Azure OpenAI integration for report generation.
-"""
+
 
 from typing import Any
+from langchain_openai import AzureChatOpenAI
 
+from app.core.logger import logger
 
 class ExplainerAgent:
     """
     Generates human-readable explanations and markdown reports using Azure OpenAI.
     """
 
-    async def explain(self, findings: list[dict[str, Any]]) -> str:
-        # TODO: Implement Azure OpenAI API calls
+    def __init__(self, findings: list[dict[str, Any]] | None, llm: AzureChatOpenAI):
+        self.findings = findings
+        self.llm = llm
+
+    def run(self) -> str:
+        
+        logger.info("Explainer Agent: generating explanation report...")
+        output = self.llm.invoke("Explain the following findings in detail:\n" + str(self.findings))
+        logger.info("Generated explanation using LLM.")
+        logger.debug(f"Findings explanation: {output}")
+
+        with open("explanation_report.md", "w") as f:
+            f.write(str(output.content))
+
         return "# Analysis Report\n\nTODO: Generate markdown report"
