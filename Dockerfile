@@ -26,7 +26,8 @@ ENV PATH="/root/.cargo/bin:$PATH"
 COPY requirements.txt pyproject.toml uv.lock* /workspace/
 
 # Install Python dependencies using uv
-RUN uv sync
+RUN uv sync && \
+    uv pip install --system semgrep radon xenon
 
 # ---- Stage: prod ----
 FROM base AS prod

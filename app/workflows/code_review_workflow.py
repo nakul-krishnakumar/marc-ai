@@ -5,6 +5,7 @@ from langgraph.graph.state import CompiledStateGraph
 
 from app.agents.auditor_agent import AuditorAgent
 from app.agents.security_agent import SecurityAgent
+from app.agents.performance_agent import PerformanceAgent
 from app.agents.style_agent import StyleAgent
 from app.core.logger import logger
 from app.workflows.state import RepoAnalysisState
@@ -36,8 +37,8 @@ def style_agent(state: RepoAnalysisState):
         log_all_audits=state["log_all_audits"],
     )
     result = styler.run()
-    state["style_findings"] = result.get("findings", [])
-    return state
+
+    return {"style_findings": result}
 
 
 def security_agent(state: RepoAnalysisState):
@@ -50,29 +51,37 @@ def security_agent(state: RepoAnalysisState):
         log_all_audits=state["log_all_audits"],
     )
     result = securer.run()
-    state["security_findings"] = result
 
-    return {"security_findings": [{"msg": "Demo security issue"}]}
+    return {"security_findings": result}
 
 
 def performance_agent(state: RepoAnalysisState):
-    logger.info("Performance Agent: running Radon.")
-    return {"performance_findings": [{"msg": "Demo performance comment"}]}
+    logger.info("Performance Agent: running Radon and Xenon.")
+
+    performer = PerformanceAgent(
+        repo_path=state["repo_path"], py_files=state["files"].py_files, log_all_audits=True
+    )
+    result = performer.run()
+
+    return {"performance_findings": result}
 
 
 def conflict_resolver(state: RepoAnalysisState):
     logger.info("Conflict Resolver: merging agent results.")
-    merged = (
-        str(state.get("style_findings", []))
-        + str(state.get("security_findings", []))
-        + str(state.get("performance_findings", []))
-    )
+    merged = [
+        state.get("style_findings", []),
+        state.get("security_findings", []),
+        state.get("performance_findings", []),
+    ]
+
     return {"merged_findings": merged}
 
 
 def explainer_agent(state: RepoAnalysisState):
     logger.info("Explainer Agent: summarizing report.")
     # markdown = "\n".join(f"- {f['msg']}" for f in state["merged_findings"])  # type: ignore
+
+    print(state)
 
     logger.info(f"Cleaning up tmpdir: {state['repo_path']}")
     shutil.rmtree(state["repo_path"], ignore_errors=True)

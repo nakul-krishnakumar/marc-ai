@@ -177,4 +177,4 @@ module.exports = [
                         f"  ESLint: {len(results)} files analyzed, {total_warnings} warnings, {total_errors} errors"
                     )
 
-        return {"agent": "style", "findings": self.findings}
+        return self.findings
