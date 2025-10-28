@@ -10,6 +10,7 @@ from app.utils.subprocess_runner import run_safe_subprocess
 
 class CyclomaticComplexity(BaseModel):
     """Cyclomatic Complexity metrics from Radon CC"""
+
     type: str  # function, method, class
     rank: str  # A, B, C, D, E, F
     complexity: int
@@ -23,12 +24,14 @@ class CyclomaticComplexity(BaseModel):
 
 class MaintainabilityIndex(BaseModel):
     """Maintainability Index from Radon MI"""
+
     rank: str  # A, B, C
     mi: float  # Maintainability Index score (0-100)
 
 
 class RawMetrics(BaseModel):
     """Raw code metrics from Radon"""
+
     loc: int  # Lines of Code
     lloc: int  # Logical Lines of Code
     sloc: int  # Source Lines of Code
@@ -40,6 +43,7 @@ class RawMetrics(BaseModel):
 
 class HalsteadMetrics(BaseModel):
     """Halstead complexity metrics"""
+
     h1: int  # Number of distinct operators
     h2: int  # Number of distinct operands
     N1: int  # Total number of operators
@@ -56,12 +60,14 @@ class HalsteadMetrics(BaseModel):
 
 class HalsteadFileMetrics(BaseModel):
     """Halstead metrics for an entire file"""
+
     total: HalsteadMetrics
     functions: dict[str, HalsteadMetrics] = {}
 
 
 class RadonFindings(BaseModel):
     """Combined Radon metrics for all files"""
+
     cc: dict[str, list[CyclomaticComplexity]] = {}  # filepath -> list of CC metrics
     mi: dict[str, MaintainabilityIndex] = {}  # filepath -> MI score
     raw: dict[str, RawMetrics] = {}  # filepath -> raw metrics
@@ -70,6 +76,7 @@ class RadonFindings(BaseModel):
 
 class XenonViolation(BaseModel):
     """Xenon threshold violations"""
+
     path: Path
     function: str
     line: int
@@ -79,6 +86,7 @@ class XenonViolation(BaseModel):
 
 class PerformanceFindings(BaseModel):
     """All performance analysis findings"""
+
     radon: RadonFindings = RadonFindings()
     xenon_violations: list[XenonViolation] = []
     summary: dict[str, Any] = {}
@@ -90,12 +98,7 @@ class PerformanceAgent:
     Only analyzes Python files.
     """
 
-    def __init__(
-        self,
-        repo_path: str,
-        py_files: int,
-        log_all_audits: bool = False
-    ) -> None:
+    def __init__(self, repo_path: str, py_files: int, log_all_audits: bool = False) -> None:
         self.repo_path = repo_path
         self.py_files = py_files
         self.log_all_audits = log_all_audits
@@ -105,10 +108,12 @@ class PerformanceAgent:
         """Run Radon Cyclomatic Complexity analysis."""
         try:
             cmd = [
-                "radon", "cc",
+                "radon",
+                "cc",
                 self.repo_path,
                 "--json",
-                "--min", "C",  # Only report C and above
+                "--min",
+                "C",  # Only report C and above
                 # "--exclude", "*/tests/*,*/venv/*,*/.venv/*,*/node_modules/*"
             ]
 
@@ -133,7 +138,8 @@ class PerformanceAgent:
         """Run Radon Maintainability Index analysis."""
         try:
             cmd = [
-                "radon", "mi",
+                "radon",
+                "mi",
                 self.repo_path,
                 "--json",
                 # "--exclude", "*/tests/*,*/venv/*,*/.venv/*,*/node_modules/*"
@@ -160,7 +166,8 @@ class PerformanceAgent:
         """Run Radon Raw Metrics analysis."""
         try:
             cmd = [
-                "radon", "raw",
+                "radon",
+                "raw",
                 self.repo_path,
                 "--json",
                 # "--exclude", "*/tests/*,*/venv/*,*/.venv/*,*/node_modules/*"
@@ -187,7 +194,8 @@ class PerformanceAgent:
         """Run Radon Halstead Metrics analysis."""
         try:
             cmd = [
-                "radon", "hal",
+                "radon",
+                "hal",
                 self.repo_path,
                 "--json",
                 # "--exclude", "*/tests/*,*/venv/*,*/.venv/*,*/node_modules/*"
@@ -216,9 +224,12 @@ class PerformanceAgent:
             cmd = [
                 "xenon",
                 self.repo_path,
-                "--max-absolute", "B",
-                "--max-modules", "B",
-                "--max-average", "A",
+                "--max-absolute",
+                "B",
+                "--max-modules",
+                "B",
+                "--max-average",
+                "A",
                 # "--exclude", "*/tests/*,*/venv/*,*/.venv/*,*/node_modules/*"
             ]
 
@@ -236,26 +247,26 @@ class PerformanceAgent:
 
     def _parse_xenon_output(self, output: str) -> None:
         """Parse Xenon text output to extract violations."""
-        lines = output.strip().split('\n')
+        lines = output.strip().split("\n")
         for line in lines:
-            if ':' in line and 'too complex' in line.lower():
+            if ":" in line and "too complex" in line.lower():
                 try:
-                    parts = line.split(':')
+                    parts = line.split(":")
                     if len(parts) >= 3:
                         path = parts[0].strip()
                         line_no = int(parts[1].strip())
 
-                        msg = ':'.join(parts[3:])
+                        msg = ":".join(parts[3:])
                         if "'" in msg:
                             func_name = msg.split("'")[1]
-                            complexity = int(msg.split('(')[-1].split(')')[0])
+                            complexity = int(msg.split("(")[-1].split(")")[0])
 
                             violation = XenonViolation(
                                 path=Path(path),
                                 function=func_name,
                                 line=line_no,
                                 complexity=complexity,
-                                rank=self._complexity_to_rank(complexity)
+                                rank=self._complexity_to_rank(complexity),
                             )
                             self.findings.xenon_violations.append(violation)
                 except Exception as e:
@@ -277,11 +288,7 @@ class PerformanceAgent:
             return "F"
 
     def _consolidate_metrics(
-        self,
-        cc_data: dict,
-        mi_data: dict,
-        raw_data: dict,
-        hal_data: dict
+        self, cc_data: dict, mi_data: dict, raw_data: dict, hal_data: dict
     ) -> None:
         """Consolidate all Radon metrics into findings."""
         # Process CC data
@@ -320,19 +327,20 @@ class PerformanceAgent:
                             function_metrics[func_name] = HalsteadMetrics(**func_data)
 
                     self.findings.radon.hal[filepath] = HalsteadFileMetrics(
-                        total=total_metrics,
-                        functions=function_metrics
+                        total=total_metrics, functions=function_metrics
                     )
             except Exception as e:
                 logger.debug(f"Error parsing Halstead for {filepath}: {e}")
 
     def _generate_summary(self) -> None:
         """Generate summary statistics"""
-        total_files = len(set(
-            list(self.findings.radon.cc.keys()) +
-            list(self.findings.radon.mi.keys()) +
-            list(self.findings.radon.raw.keys())
-        ))
+        total_files = len(
+            set(
+                list(self.findings.radon.cc.keys())
+                + list(self.findings.radon.mi.keys())
+                + list(self.findings.radon.raw.keys())
+            )
+        )
 
         total_functions = sum(len(cc_list) for cc_list in self.findings.radon.cc.values())
 
@@ -355,7 +363,7 @@ class PerformanceAgent:
             "complexity_distribution": complexity_ranks,
             "average_maintainability_index": round(avg_mi, 2),
             "total_lines_of_code": total_loc,
-            "xenon_violations": len(self.findings.xenon_violations)
+            "xenon_violations": len(self.findings.xenon_violations),
         }
 
     def run(self) -> PerformanceFindings:
@@ -385,13 +393,17 @@ class PerformanceAgent:
             logger.info("Performance Agent findings:")
             logger.info(f"  Files analyzed: {self.findings.summary.get('total_files_analyzed', 0)}")
             logger.info(f"  Functions analyzed: {self.findings.summary.get('total_functions', 0)}")
-            logger.info(f"  Average MI: {self.findings.summary.get('average_maintainability_index', 0)}")
+            logger.info(
+                f"  Average MI: {self.findings.summary.get('average_maintainability_index', 0)}"
+            )
             logger.info(f"  Total LOC: {self.findings.summary.get('total_lines_of_code', 0)}")
             logger.info(f"  Xenon violations: {len(self.findings.xenon_violations)}")
 
             if self.findings.xenon_violations:
                 logger.info("  Top violations:")
                 for violation in self.findings.xenon_violations[:3]:
-                    logger.info(f"    - {violation.function} ({violation.path}:{violation.line}) - Complexity: {violation.complexity}")
+                    logger.info(
+                        f"    - {violation.function} ({violation.path}:{violation.line}) - Complexity: {violation.complexity}"
+                    )
 
         return self.findings

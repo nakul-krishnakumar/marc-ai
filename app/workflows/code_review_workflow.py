@@ -38,7 +38,7 @@ def style_agent(state: RepoAnalysisState):
     )
     result = styler.run()
 
-    return { "style_findings": result }
+    return {"style_findings": result}
 
 
 def security_agent(state: RepoAnalysisState):
@@ -52,19 +52,18 @@ def security_agent(state: RepoAnalysisState):
     )
     result = securer.run()
 
-    return { "security_findings": result }
+    return {"security_findings": result}
+
 
 def performance_agent(state: RepoAnalysisState):
     logger.info("Performance Agent: running Radon and Xenon.")
-    
+
     performer = PerformanceAgent(
-        repo_path=state["repo_path"],
-        py_files=state["files"].py_files,
-        log_all_audits=True
+        repo_path=state["repo_path"], py_files=state["files"].py_files, log_all_audits=True
     )
     result = performer.run()
-    
-    return { "performance_findings": result }
+
+    return {"performance_findings": result}
 
 
 def conflict_resolver(state: RepoAnalysisState):
